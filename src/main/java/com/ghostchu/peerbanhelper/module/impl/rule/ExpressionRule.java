@@ -171,7 +171,7 @@ public class ExpressionRule extends AbstractRuleFeatureModule implements Reloada
             CheckResult result;
             try {
                 Map<String, Object> env = expression.newEnv();
-                env.put("torrent", torrent);
+                env.put("dev/foxgirl/torrent", torrent);
                 env.put("peer", peer);
                 env.put("downloader",downloader);
                 env.put("cacheable", new AtomicBoolean(false));

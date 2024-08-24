@@ -155,3 +155,8 @@ performance:
   # Enable EcoQoS API on Windows Platform for power saving, for exchange, the program performance will reduce and cronjobs may delay
   # https://devblogs.microsoft.com/performance-diagnostics/introducing-ecoqos/
   windows-ecoqos-api: true
+
+# Youkai 设置 - Youkai settings
+youkai:
+  # 端口 - Port
+  port: 9897
