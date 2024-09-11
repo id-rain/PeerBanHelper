@@ -35,16 +35,20 @@ public class IPAddressUtil {
      */
     @Nullable
     public static IPAddress getIPAddress(String ip) {
+        if(ip.startsWith("[") && ip.endsWith("]")){
+            ip = ip.substring(1, ip.length() - 1);
+        }
+        final String ipCopy = ip;
         try {
             return IP_ADDRESS_CACHE.get(ip, () -> {
-                IPAddress ipAddress = new IPAddressString(ip).toAddress();
+                IPAddress ipAddress = new IPAddressString(ipCopy).toAddress();
                 if (ipAddress.isIPv4Convertible()) {
                     ipAddress = ipAddress.toIPv4();
                 }
                 return ipAddress;
             });
         } catch (ExecutionException e) {
-            log.error("Unable to get ipaddress from ip {}", ip, e);
+            log.error("Unable to get ipaddress from ip {}", ipCopy, e);
             return null;
         }
     }
