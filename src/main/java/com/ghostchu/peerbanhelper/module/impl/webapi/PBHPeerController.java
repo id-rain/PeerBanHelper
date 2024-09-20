@@ -58,7 +58,8 @@ public class PBHPeerController extends AbstractFeatureModule {
         javalinWebContainer.javalin()
                 .get("/api/peer/{ip}", this::handleInfo, Role.USER_READ)
                 .get("/api/peer/{ip}/accessHistory", this::handleAccessHistory, Role.USER_READ)
-                .get("/api/peer/{ip}/banHistory", this::handleBanHistory, Role.USER_READ);
+                .get("/api/peer/{ip}/banHistory", this::handleBanHistory, Role.USER_READ)
+                .get("/api/peer/{ip}/identities", this::handleBanHistory, Role.USER_READ);
 
     }
 

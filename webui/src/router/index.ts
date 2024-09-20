@@ -167,6 +167,34 @@ export const routerOptions: RouteRecordRaw[] = [
     ]
   },
   {
+    path: '/history',
+    name: 'history',
+    meta: {
+      label: 'router.history',
+      needLogin: true
+    },
+    children: [
+      {
+        path: '/torrents',
+        name: 'torrent_history',
+        meta: {
+          label: 'router.history.torrents',
+          needLogin: true
+        },
+        component:  () => import('@/views/torrents/index.vue')
+      },
+      // {
+      //   path: '/peers',
+      //   name: 'peer_details',
+      //   meta: {
+      //     label: 'router.details.oeers',
+      //     needLogin: true
+      //   },
+      //   component: () => import('@/views/peers/index.vue')
+      // }
+    ]
+  },
+  {
     path: '/init',
     name: 'init',
     meta: {

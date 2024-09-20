@@ -70,7 +70,7 @@ public class PBHTorrentController extends AbstractFeatureModule {
 
     private void handleTorrentList(Context ctx) throws SQLException {
         Pageable pageable = new Pageable(ctx);
-        ctx.json(new StdResp(true, null, torrentDao.queryByPaging(pageable)));
+        ctx.json(new StdResp(true, null, torrentDao.queryByPaging(torrentDao.queryBuilder().orderBy("name",true), pageable)));
     }
 
 
