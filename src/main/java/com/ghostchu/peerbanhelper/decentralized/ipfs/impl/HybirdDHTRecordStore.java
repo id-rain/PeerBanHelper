@@ -8,9 +8,7 @@ import org.peergos.protocol.dht.RecordStore;
 import org.peergos.protocol.ipns.IpnsRecord;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Deque;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Executors;

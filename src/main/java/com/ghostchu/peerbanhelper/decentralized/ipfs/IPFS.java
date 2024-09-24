@@ -2,6 +2,7 @@ package com.ghostchu.peerbanhelper.decentralized.ipfs;
 
 import com.ghostchu.peerbanhelper.Main;
 import com.ghostchu.peerbanhelper.database.dao.impl.DHTRecordDao;
+import com.ghostchu.peerbanhelper.decentralized.ipfs.impl.HybirdDHTRecordStore;
 import io.ipfs.cid.Cid;
 import io.ipfs.multiaddr.MultiAddress;
 import io.libp2p.core.PeerId;
@@ -37,6 +38,8 @@ public class IPFS {
 
     @Autowired
     private DHTRecordDao dhtRecordDao;
+    @Autowired
+    private HybirdDHTRecordStore hybirdDHTRecordStore;
 
     public void init() {
         List<MultiAddress> swarmAddresses = List.of(
@@ -60,7 +63,7 @@ public class IPFS {
         Optional<HttpProtocol.HttpRequestProcessor> httpProxyTarget =
                 Optional.of((s, req, h) -> HttpProtocol.proxyRequest(req, httpTarget, h));
         EmbeddedIpfs ipfs = EmbeddedIpfs.build(
-                dhtRecordDao,
+                hybirdDHTRecordStore,
                 new FileBlockstore(blockStoreDirectory.toPath()),
                 provideBlocks,
                 swarmAddresses,
