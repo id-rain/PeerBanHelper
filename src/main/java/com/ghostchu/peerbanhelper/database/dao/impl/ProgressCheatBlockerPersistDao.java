@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -52,7 +53,7 @@ public class ProgressCheatBlockerPersistDao extends AbstractPBHDao<ProgressCheat
         ).collect(Collectors.toCollection(CopyOnWriteArrayList::new)); // 可变 List，需要并发安全
     }
 
-    public void flushDatabase(List<ProgressCheatBlocker.ClientTaskRecord> records) throws SQLException {
+    public void flushDatabase(Deque<ProgressCheatBlocker.ClientTaskRecord> records) throws SQLException {
         callBatchTasks(() -> {
             records.forEach(record -> {
                 String torrentId = record.client().getTorrentId();

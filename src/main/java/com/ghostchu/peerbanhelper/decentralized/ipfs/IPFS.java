@@ -1,6 +1,7 @@
 package com.ghostchu.peerbanhelper.decentralized.ipfs;
 
 import com.ghostchu.peerbanhelper.Main;
+import com.ghostchu.peerbanhelper.database.dao.impl.DHTRecordDao;
 import io.ipfs.cid.Cid;
 import io.ipfs.multiaddr.MultiAddress;
 import io.libp2p.core.PeerId;
@@ -8,8 +9,8 @@ import io.libp2p.core.crypto.PrivKey;
 import org.peergos.*;
 import org.peergos.blockstore.FileBlockstore;
 import org.peergos.config.IdentitySection;
-import org.peergos.protocol.dht.RamRecordStore;
 import org.peergos.protocol.http.HttpProtocol;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -22,13 +23,20 @@ import java.util.concurrent.CompletableFuture;
 
 @Component
 public class IPFS {
-    private static File dataDirectory = new File(Main.getDataDirectory(), "ipfs-blockstore");
+    private static final File dataDirectory = new File(Main.getDataDirectory(), "ipfs");
+    private static final File blockStoreDirectory = new File(dataDirectory, "blockstore");
 
     static {
         if (!dataDirectory.exists()) {
             dataDirectory.mkdirs();
         }
+        if (!blockStoreDirectory.exists()) {
+            blockStoreDirectory.mkdirs();
+        }
     }
+
+    @Autowired
+    private DHTRecordDao dhtRecordDao;
 
     public void init() {
         List<MultiAddress> swarmAddresses = List.of(
@@ -51,8 +59,9 @@ public class IPFS {
         SocketAddress httpTarget = new InetSocketAddress("localhost", 10000);
         Optional<HttpProtocol.HttpRequestProcessor> httpProxyTarget =
                 Optional.of((s, req, h) -> HttpProtocol.proxyRequest(req, httpTarget, h));
-        EmbeddedIpfs ipfs = EmbeddedIpfs.build(new RamRecordStore(),
-                new FileBlockstore(dataDirectory.toPath()),
+        EmbeddedIpfs ipfs = EmbeddedIpfs.build(
+                dhtRecordDao,
+                new FileBlockstore(blockStoreDirectory.toPath()),
                 provideBlocks,
                 swarmAddresses,
                 bootstrapAddresses,
