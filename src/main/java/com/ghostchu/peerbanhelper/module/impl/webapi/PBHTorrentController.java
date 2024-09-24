@@ -82,7 +82,7 @@ public class PBHTorrentController extends AbstractFeatureModule {
                         .queryBuilder()
                 , pageable);
         var result = page.getResults().stream().map(r -> new PBHBanController.BanLogResponse(locale(ctx), r)).toList();
-        ctx.json(new StdResp(true, null, result));
+        ctx.json(new StdResp(true, null, new Page<>(pageable, page.getTotal(), result)));
     }
 
 
@@ -118,7 +118,7 @@ public class PBHTorrentController extends AbstractFeatureModule {
                     .countOf();
             infoList.add(new TorrentInfo(result.getInfoHash(), result.getName(), result.getSize(), peerBanCount, peerAccessCount));
         }
-        ctx.json(new StdResp(true, null, infoList));
+        ctx.json(new StdResp(true, null, new Page<>(pageable, torrentEntityPage.getTotal(), infoList)));
     }
 
 
