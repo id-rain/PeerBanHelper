@@ -3,6 +3,7 @@ package com.ghostchu.peerbanhelper;
 import com.ghostchu.peerbanhelper.alert.AlertManager;
 import com.ghostchu.peerbanhelper.database.Database;
 import com.ghostchu.peerbanhelper.database.dao.impl.BanListDao;
+import com.ghostchu.peerbanhelper.decentralized.ipfs.IPFS;
 import com.ghostchu.peerbanhelper.downloader.Downloader;
 import com.ghostchu.peerbanhelper.downloader.DownloaderLastStatus;
 import com.ghostchu.peerbanhelper.downloader.DownloaderLoginResult;
@@ -135,6 +136,8 @@ public class PeerBanHelperServer implements Reloadable {
     private ErrorReporter errorReporter;
     @Autowired
     private RollbarErrorReporter rollbarErrorReporter;
+    @Autowired
+    private IPFS ipfs;
 
     public PeerBanHelperServer() {
         reloadConfig();
@@ -173,17 +176,24 @@ public class PeerBanHelperServer implements Reloadable {
         resetKnownDownloaders();
         loadBanListToMemory();
         registerTimer();
+        bootIPFS();
         banListInvoker.forEach(BanListInvoker::reset);
         GENERAL_SCHEDULER.scheduleWithFixedDelay(this::saveBanList, 10 * 1000, BANLIST_SAVE_INTERVAL, TimeUnit.MILLISECONDS);
         Main.getEventBus().post(new PBHServerStartedEvent(this));
-
         if (webContainer.getToken() == null || webContainer.getToken().isBlank()) {
             for (int i = 0; i < 50; i++) {
                 log.error(tlUI(Lang.PBH_OOBE_REQUIRED, "http://localhost:" + webContainer.javalin().port()));
             }
         }
-
         Main.getReloadManager().register(this);
+    }
+
+    private void bootIPFS() {
+        try {
+            ipfs.init(Main.getMainConfig().getInt("ipfs.port"), Main.getMainConfig().getBoolean("ipfs.run-as-relay"));
+        } catch (IOException e) {
+            log.warn("Unable to startup IPFS instance");
+        }
     }
 
     public void loadDownloaders() {
@@ -213,7 +223,7 @@ public class PeerBanHelperServer implements Reloadable {
                     downloader = Transmission.loadFromConfig(client, pbhServerAddress, downloaderSection);
             case "biglybt" -> downloader = BiglyBT.loadFromConfig(client, downloaderSection);
             case "deluge" -> downloader = Deluge.loadFromConfig(client, downloaderSection);
-            case "bitcomet"->downloader = BitComet.loadFromConfig(client, downloaderSection);
+            case "bitcomet" -> downloader = BitComet.loadFromConfig(client, downloaderSection);
             //case "rtorrent" -> downloader = RTorrent.loadFromConfig(client, downloaderSection);
         }
         return downloader;
@@ -232,7 +242,7 @@ public class PeerBanHelperServer implements Reloadable {
                     downloader = Transmission.loadFromConfig(client, pbhServerAddress, downloaderSection);
             case "biglybt" -> downloader = BiglyBT.loadFromConfig(client, downloaderSection);
             case "deluge" -> downloader = Deluge.loadFromConfig(client, downloaderSection);
-            case "bitcomet"->downloader = BitComet.loadFromConfig(client, downloaderSection);
+            case "bitcomet" -> downloader = BitComet.loadFromConfig(client, downloaderSection);
             //case "rtorrent" -> downloader = RTorrent.loadFromConfig(client, downloaderSection);
         }
         return downloader;
@@ -331,7 +341,7 @@ public class PeerBanHelperServer implements Reloadable {
             this.BAN_LIST.putAll(data);
             log.info(tlUI(Lang.LOAD_BANLIST_FROM_FILE, data.size()));
             downloaders.forEach(downloader -> {
-               downloader.login();
+                downloader.login();
                 downloader.setBanList(BAN_LIST.keySet(), null, null, true);
             });
             Collection<TorrentWrapper> relaunch = data.values().stream().map(BanMetadata::getTorrent).toList();
@@ -694,11 +704,11 @@ public class PeerBanHelperServer implements Reloadable {
             torrents.forEach(torrent -> protect.getService().submit(() -> {
                 try {
                     parallelReqRestrict.acquire();
-                    var p =  downloader.getPeers(torrent);
-                    peers.put(torrent,p);
+                    var p = downloader.getPeers(torrent);
+                    peers.put(torrent, p);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                }  catch (Exception e) {
+                } catch (Exception e) {
                     log.error("Unable to retrieve peers", e);
                 } finally {
                     parallelReqRestrict.release();
