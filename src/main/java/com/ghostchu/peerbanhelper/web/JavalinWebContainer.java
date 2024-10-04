@@ -43,6 +43,11 @@ public class JavalinWebContainer {
     private Cache<String, AtomicInteger> FAIL2BAN = CacheBuilder.newBuilder()
             .expireAfterWrite(15, TimeUnit.MINUTES)
             .build();
+    @Getter
+    private String host;
+    @Getter
+    private int port;
+    public static String LOCAL_ACCESS_VERIFY_TOKEN = UUID.randomUUID().toString();
 
     public JavalinWebContainer(ActivationManager activationManager) {
         JsonMapper gsonMapper = new JsonMapper() {
@@ -118,7 +123,7 @@ public class JavalinWebContainer {
                     ctx.json(new StdResp(false, tl(reqLocale(ctx), Lang.WEBAPI_INTERNAL_ERROR), null));
                     log.error("500 Internal Server Error", e);
                 })
-                .beforeMatched(ctx -> {
+                .beforeMatched("/api", ctx -> {
                     if (ctx.routeRoles().isEmpty()) {
                         return;
                     }
@@ -129,9 +134,6 @@ public class JavalinWebContainer {
                         if (!activationManager.isActivated()) {
                             throw new RequirePBHPlusLicenseException("PBH Plus License not activated");
                         }
-                    }
-                    if (ctx.path().startsWith("/init")) {
-                        return;
                     }
                     if (token == null || token.isBlank()) {
                         throw new NeedInitException();
@@ -162,6 +164,8 @@ public class JavalinWebContainer {
 
     public void start(String host, int port, String token) {
         this.token = token;
+        this.host = host;
+        this.port = port;
         javalin.start(host, port);
     }
 

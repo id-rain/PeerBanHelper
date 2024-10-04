@@ -3,6 +3,10 @@ package com.ghostchu.peerbanhelper.decentralized.ipfs;
 import com.ghostchu.peerbanhelper.Main;
 import com.ghostchu.peerbanhelper.database.dao.impl.DHTRecordDao;
 import com.ghostchu.peerbanhelper.decentralized.ipfs.impl.HybirdDHTRecordStore;
+import com.ghostchu.peerbanhelper.web.JavalinWebContainer;
+import com.ghostchu.peerbanhelper.web.Role;
+import com.ghostchu.peerbanhelper.web.exception.IPAddressBannedException;
+import com.ghostchu.peerbanhelper.web.wrapper.StdResp;
 import com.ghostchu.simplereloadlib.ReloadResult;
 import com.ghostchu.simplereloadlib.Reloadable;
 import io.ipfs.multiaddr.MultiAddress;
@@ -10,6 +14,8 @@ import io.libp2p.core.PeerId;
 import io.libp2p.core.crypto.PrivKey;
 import io.libp2p.core.crypto.PubKey;
 import io.libp2p.crypto.keys.Ed25519Kt;
+import io.netty.buffer.Unpooled;
+import io.netty.handler.codec.http.*;
 import lombok.Getter;
 import org.peergos.BlockRequestAuthoriser;
 import org.peergos.EmbeddedIpfs;
@@ -24,10 +30,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class IPFS implements Reloadable {
@@ -53,6 +62,12 @@ public class IPFS implements Reloadable {
     private PrivKey identityEd25519Private;
     @Getter
     private PubKey identityEd25519Public;
+    @Getter
+    private Map<String, HttpProtocol.HttpRequestProcessor> proxyHandlers = new ConcurrentHashMap<>();
+    @Autowired
+    private JavalinWebContainer webContainer;
+    @Autowired
+    private JavalinWebContainer javalinWebContainer;
 
     public IPFS() {
         Main.getReloadManager().register(this);
@@ -62,6 +77,10 @@ public class IPFS implements Reloadable {
     public ReloadResult reloadModule() throws Exception {
         reloadConfig();
         return Reloadable.super.reloadModule();
+    }
+
+    public void registerProxyHandler(String endpoint, HttpProtocol.HttpRequestProcessor processor) {
+        proxyHandlers.put(endpoint, processor);
     }
 
     private void reloadConfig() throws IOException {
@@ -75,6 +94,7 @@ public class IPFS implements Reloadable {
             Files.write(privateKeyFile.toPath(), keyPair.component1().bytes());
             Files.write(publicKeyFile.toPath(), keyPair.component2().bytes());
         } else {
+
             identityEd25519Private = Ed25519Kt.unmarshalEd25519PrivateKey(Files.readAllBytes(privateKeyFile.toPath()));
             identityEd25519Public = Ed25519Kt.unmarshalEd25519PublicKey(Files.readAllBytes(publicKeyFile.toPath()));
         }
@@ -82,6 +102,23 @@ public class IPFS implements Reloadable {
 
     public void init(int port, boolean isRelayNode) throws IOException {
         reloadConfig();
+        webContainer.javalin().beforeMatched("/p2p-api", ctx -> {
+            if (ctx.routeRoles().isEmpty()) {
+                return;
+            }
+            if (ctx.routeRoles().contains(Role.ANYONE)) {
+                return;
+            }
+            if (!webContainer.allowAttemptLogin(ctx.ip())) {
+                throw new IPAddressBannedException();
+            }
+            var token = ctx.header("X-P2P-LoopBack-WebAPI-Token");
+            if (!webContainer.getToken().equals(token)) {
+                ctx.status(403);
+                ctx.json(new StdResp(false, "Unable to access P2P loop-back endpoints without valid webapi token (external access?)", null));
+                webContainer.markLoginFailed(ctx.ip());
+            }
+        });
         List<MultiAddress> swarmAddresses = List.of(new MultiAddress("/ip6/::/tcp/" + port));
         List<MultiAddress> bootstrapAddresses = List.of(
                 new MultiAddress("/dnsaddr/bootstrap.libp2p.io/p2p/QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbXJJ16u19uLTa"),
@@ -106,9 +143,6 @@ public class IPFS implements Reloadable {
         PeerId peerId = builder.getPeerId();
         IdentitySection identity = new IdentitySection(privKey.bytes(), peerId);
         boolean provideBlocks = true;
-        SocketAddress httpTarget = new InetSocketAddress("127.80.66.72", 7355);// 80=P, 66=B, 72=H, 7355=Magic Number (7355_608)
-        Optional<HttpProtocol.HttpRequestProcessor> httpProxyTarget =
-                Optional.of((s, req, h) -> HttpProtocol.proxyRequest(req, httpTarget, h));
         EmbeddedIpfs ipfs = EmbeddedIpfs.build(
                 hybirdDHTRecordStore,
                 new FileBlockstore(blockStoreDirectory.toPath()),
@@ -117,7 +151,7 @@ public class IPFS implements Reloadable {
                 bootstrapAddresses,
                 identity,
                 authoriser,
-                httpProxyTarget
+                Optional.of(proxyHandler())
         );
         ipfs.start();
         this.ipfs = ipfs;
@@ -126,6 +160,34 @@ public class IPFS implements Reloadable {
         }
     }
 
+    private HttpProtocol.HttpRequestProcessor proxyHandler() {
+        return (s, req, h) -> {
+            var host = webContainer.getHost();
+            if (host.equals("0.0.0.0")) {
+                host = "127.0.0.1";
+            }
+            if (host.equals("::") || host.equals("[::]")) {
+                host = "::1";
+            }
+            SocketAddress httpTarget = new InetSocketAddress(host, webContainer.javalin().port());
+            if (!req.uri().startsWith("/p2p-api/")) {
+                var ct = "Access denied - P2P can only access /p2p-api/ endpoints";
+                FullHttpResponse replyOk = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.FORBIDDEN, Unpooled.wrappedBuffer(ct.getBytes(StandardCharsets.UTF_8)));
+                replyOk.headers().set(HttpHeaderNames.CONTENT_LENGTH, ct.length());
+                h.accept(replyOk.retain());
+                return;
+            }
+            req.headers().add("X-P2P-PeerID", s.remotePeerId().toBase58());
+            req.headers().add("X-P2P-LoopBack-WebAPI-Token", javalinWebContainer.getToken());
+            HttpProtocol.proxyRequest(req, httpTarget, h);
+        };
+    }
+
+    public record Manifest(
+            String version
+    ) {
+
+    }
 //
 //    public void checkRelays(PrivKey identityEd25519) {
 //        relayListOperationLock.lock();

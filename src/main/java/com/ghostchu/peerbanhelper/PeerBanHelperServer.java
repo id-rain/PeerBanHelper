@@ -17,6 +17,7 @@ import com.ghostchu.peerbanhelper.event.LivePeersUpdatedEvent;
 import com.ghostchu.peerbanhelper.event.PBHServerStartedEvent;
 import com.ghostchu.peerbanhelper.event.PeerBanEvent;
 import com.ghostchu.peerbanhelper.event.PeerUnbanEvent;
+import com.ghostchu.peerbanhelper.friend.FriendManager;
 import com.ghostchu.peerbanhelper.invoker.BanListInvoker;
 import com.ghostchu.peerbanhelper.invoker.impl.CommandExec;
 import com.ghostchu.peerbanhelper.invoker.impl.IPFilterInvoker;
@@ -138,6 +139,8 @@ public class PeerBanHelperServer implements Reloadable {
     private RollbarErrorReporter rollbarErrorReporter;
     @Autowired
     private IPFS ipfs;
+    @Autowired
+    private FriendManager friendManager;
 
     public PeerBanHelperServer() {
         reloadConfig();

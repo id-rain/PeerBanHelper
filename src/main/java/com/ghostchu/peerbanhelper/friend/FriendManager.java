@@ -33,6 +33,7 @@ public class FriendManager implements AutoCloseable {
             friends.add(new Friend(
                     ipfs,
                     f.getPeerId(),
+                    f.getPubKey(),
                     f.getLastAttemptConnectTime().getTime(),
                     f.getLastCommunicationTime().getTime(),
                     f.getLastRecordedPBHVersion()

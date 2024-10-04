@@ -24,6 +24,7 @@ public class FriendDao extends AbstractPBHDao<FriendEntity, String> {
         callBatchTasks(() -> {
             var entities = friends.stream().map(f -> new FriendEntity(
                     f.getPeerId(),
+                    f.getPubKey(),
                     new Timestamp(f.getLastAttemptConnectTime()),
                     new Timestamp(f.getLastCommunicationTime()),
                     f.getLastRecordedPBHVersion(),

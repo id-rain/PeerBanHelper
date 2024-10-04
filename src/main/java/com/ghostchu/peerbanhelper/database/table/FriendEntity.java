@@ -15,6 +15,8 @@ import java.sql.Timestamp;
 public final class FriendEntity {
     @DatabaseField(id = true, index = true)
     private String peerId;
+    @DatabaseField
+    private byte[] pubKey;
     @DatabaseField(canBeNull = false)
     private Timestamp lastAttemptConnectTime;
     @DatabaseField(canBeNull = false)
