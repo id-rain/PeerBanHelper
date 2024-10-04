@@ -33,7 +33,10 @@ import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.Deque;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 
 import static com.ghostchu.peerbanhelper.text.TextManager.tlUI;
@@ -114,12 +117,8 @@ public class ProgressCheatBlocker extends AbstractRuleFeatureModule implements R
 
     private void flushDatabase() {
         try {
-            List<ClientTaskRecord> records = new ArrayList<>();
-            while (!pendingPersistQueue.isEmpty()) {
-                records.add(pendingPersistQueue.poll());
-            }
             try {
-                progressCheatBlockerPersistDao.flushDatabase(records);
+                progressCheatBlockerPersistDao.flushDatabase(pendingPersistQueue);
             } catch (SQLException e) {
                 log.error("Unable flush records into database", e);
                 rollbarErrorReporter.error(e);

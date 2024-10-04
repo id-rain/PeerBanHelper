@@ -55,8 +55,8 @@ public class PBHPeerController extends AbstractFeatureModule {
     public void onEnable() {
         javalinWebContainer.javalin()
                 .get("/api/peer/{ip}", this::handleInfo, Role.USER_READ)
-                .get("/api/peer/{ip}/accessHistory", this::handleAccessHistory, Role.USER_READ)
-                .get("/api/peer/{ip}/banHistory", this::handleBanHistory, Role.USER_READ);
+                .get("/api/peer/{ip}/accessHistory", this::handleAccessHistory, Role.USER_READ, Role.PBH_PLUS)
+                .get("/api/peer/{ip}/banHistory", this::handleBanHistory, Role.USER_READ, Role.PBH_PLUS);
 
     }
 
@@ -120,7 +120,9 @@ public class PBHPeerController extends AbstractFeatureModule {
         } catch (Exception e) {
             log.warn("Unable to perform GeoIP query for ip {}", ip);
         }
-        var info = new PeerInfo(ip, firstTimeSeenTS, lastTimeSeenTS, banCount, torrentAccessCount, uploadedToPeer, downloadedFromPeer, geoIP);
+        var info = new PeerInfo(
+                upDownResult != null,
+                ip, firstTimeSeenTS, lastTimeSeenTS, banCount, torrentAccessCount, uploadedToPeer, downloadedFromPeer, geoIP);
         ctx.json(new StdResp(true, null, info));
     }
 
@@ -160,6 +162,7 @@ public class PBHPeerController extends AbstractFeatureModule {
     }
 
     public record PeerInfo(
+            boolean found,
             String address,
             long firstTimeSeen,
             long lastTimeSeen,

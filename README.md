@@ -5,7 +5,7 @@
 ![page-views](https://raw.githubusercontent.com/PBH-BTN/views-counter/refs/heads/master/svg/754169590/badge.svg)
 
 > [!NOTE]
-> PeerBanHelper 没有内建的更新检查程序，记得时常回来看看是否有新的版本更新，或者 Watch 本仓库以接收版本更新通知  
+> PeerBanHelper 没有内建的更新检查程序，记得时常回来看看是否有新的版本更新，或者 Watch 本仓库(Custom -> Releases, Issues 和 Discussions)以接收版本更新通知  
 > QQ 交流群：932978658，如果在使用过程中需要帮助，您可以在这里和他人一同交流。或者在 [Issue Tracker](https://github.com/Ghost-chu/PeerBanHelper/issues) 打开新问题
 
 > [!TIP]
@@ -28,11 +28,13 @@
 * BiglyBT（需要安装[插件](https://github.com/PBH-BTN/PBH-Adapter-BiglyBT)）
 * Deluge（需要安装[插件](https://github.com/PBH-BTN/PBH-Adapter-Deluge)）
 * Azureus(Vuze)（需要安装[插件](https://github.com/PBH-BTN/PBH-Adapter-Azureus)）
-* Transmission **(3.00-20 或更高版本，不建议使用)**
+* Transmission **(不建议使用；3.00-20 或更高版本)**
+* BitComet **v2.10 Beta6 [20240928] 或更高版本**
 
 ## 注意事项
 
-请不要打开下载器中的 "允许来自同一 IP 地址的多个连接" 选项，这会干扰 PBH 计算数据，并导致错误封禁。
+请不要打开下载器中的 "允许来自同一 IP 地址的多个连接" 选项，这会干扰 PBH 计算数据，并导致错误封禁。  
+如果您的下载器存在 PT 站种子，在添加下载器时建议开启 “忽略私有种子”。
   
 ## 功能介绍
 

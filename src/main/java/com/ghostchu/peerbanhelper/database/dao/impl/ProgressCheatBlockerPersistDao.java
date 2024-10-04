@@ -27,7 +27,7 @@ public class ProgressCheatBlockerPersistDao extends AbstractPBHDao<ProgressCheat
 
     public List<ProgressCheatBlocker.ClientTask> fetchFromDatabase(ProgressCheatBlocker.Client client, Timestamp after) throws SQLException {
         IPAddress address = IPAddressUtil.getIPAddress(client.getPeerPrefix());
-        if(address == null) return Collections.emptyList();
+        if (address == null) return Collections.emptyList();
         List<ProgressCheatBlockerPersistEntity> entities = queryBuilder()
                 .where()
                 .eq("torrentId", client.getTorrentId())
@@ -55,7 +55,8 @@ public class ProgressCheatBlockerPersistDao extends AbstractPBHDao<ProgressCheat
 
     public void flushDatabase(Deque<ProgressCheatBlocker.ClientTaskRecord> records) throws SQLException {
         callBatchTasks(() -> {
-            records.forEach(record -> {
+            while (!records.isEmpty()) {
+                var record = records.pop();
                 String torrentId = record.client().getTorrentId();
                 record.task().forEach(task -> {
                     try {
@@ -89,7 +90,7 @@ public class ProgressCheatBlockerPersistDao extends AbstractPBHDao<ProgressCheat
                         log.error("Unable write PCB persist data into database", e);
                     }
                 });
-            });
+            }
             return null;
         });
     }

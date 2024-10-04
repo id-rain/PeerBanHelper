@@ -15,6 +15,7 @@ import com.ghostchu.peerbanhelper.web.JavalinWebContainer;
 import com.ghostchu.peerbanhelper.web.Role;
 import com.ghostchu.peerbanhelper.web.wrapper.StdResp;
 import io.javalin.http.Context;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +27,7 @@ import static com.ghostchu.peerbanhelper.text.TextManager.tl;
 
 @Component
 @IgnoreScan
+@Slf4j
 public class PBHTorrentController extends AbstractFeatureModule {
     private final JavalinWebContainer javalinWebContainer;
     private final TorrentDao torrentDao;
@@ -61,8 +63,8 @@ public class PBHTorrentController extends AbstractFeatureModule {
                 //.get("/api/torrent", this::handleTorrentQuery, Role.USER_READ)
                 .get("/api/torrent/query", this::handleTorrentQuery, Role.USER_READ)
                 .get("/api/torrent/{infoHash}", this::handleTorrentInfo, Role.USER_READ)
-                .get("/api/torrent/{infoHash}/accessHistory", this::handleConnectHistory, Role.USER_READ)
-                .get("/api/torrent/{infoHash}/banHistory", this::handleBanHistory, Role.USER_READ);
+                .get("/api/torrent/{infoHash}/accessHistory", this::handleConnectHistory, Role.USER_READ, Role.PBH_PLUS)
+                .get("/api/torrent/{infoHash}/banHistory", this::handleBanHistory, Role.USER_READ, Role.PBH_PLUS);
     }
 
     private void handleBanHistory(Context ctx) throws SQLException {
