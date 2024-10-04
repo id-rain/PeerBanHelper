@@ -120,6 +120,7 @@ import { useI18n } from 'vue-i18n'
 import { usePagination } from 'vue-request'
 import AccessHistoryModal from './accessHistoryModal.vue'
 import BanHistoryModal from './banHistoryModal.vue'
+
 const forceLoading = ref(true)
 const endpointState = useEndpointStore()
 const { t } = useI18n()

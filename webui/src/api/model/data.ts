@@ -1,4 +1,5 @@
 import type { IPGeoData } from './banlist'
+
 export interface TorrentInfo {
   id: number
   infoHash: string

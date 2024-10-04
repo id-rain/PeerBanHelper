@@ -12,6 +12,7 @@
 import '@dzangolab/flag-icon-css/less/flag-icon.less'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+
 const { locale } = useI18n()
 
 const props = defineProps<{

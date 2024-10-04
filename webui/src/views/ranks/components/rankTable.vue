@@ -59,6 +59,7 @@ import { useAutoUpdatePlugin } from '@/stores/autoUpdate'
 import type { TableColumnData } from '@arco-design/web-vue'
 import { useI18n } from 'vue-i18n'
 import { usePagination } from 'vue-request'
+
 const { t } = useI18n()
 const columns: TableColumnData[] = [
   {

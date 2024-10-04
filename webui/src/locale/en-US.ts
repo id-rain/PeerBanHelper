@@ -10,6 +10,7 @@ import ruleManageMentLocale from '@/views/rule-management/locale/en-US'
 import ruleMetricsLocale from '@/views/rule-metrics/locale/en-US'
 import plusLocale from './en-US/plus'
 import settingsLocale from './en-US/settings'
+
 export default {
   'navbar.action.locale': 'Switch to English',
   'navbar.action.autoUpdate': 'Auto Update',
