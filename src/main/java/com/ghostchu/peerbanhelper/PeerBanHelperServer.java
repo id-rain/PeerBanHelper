@@ -3,6 +3,7 @@ package com.ghostchu.peerbanhelper;
 import com.ghostchu.peerbanhelper.alert.AlertManager;
 import com.ghostchu.peerbanhelper.database.Database;
 import com.ghostchu.peerbanhelper.database.dao.impl.BanListDao;
+import com.ghostchu.peerbanhelper.decentralized.kademlia.KademliaManager;
 import com.ghostchu.peerbanhelper.downloader.Downloader;
 import com.ghostchu.peerbanhelper.downloader.DownloaderLastStatus;
 import com.ghostchu.peerbanhelper.downloader.DownloaderLoginResult;
@@ -136,6 +137,8 @@ public class PeerBanHelperServer implements Reloadable {
     private ErrorReporter errorReporter;
     @Autowired
     private RollbarErrorReporter rollbarErrorReporter;
+    @Autowired
+    private KademliaManager kademliaManager;
 
     public PeerBanHelperServer() {
         reloadConfig();

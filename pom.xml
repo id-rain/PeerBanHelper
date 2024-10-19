@@ -411,11 +411,11 @@
             <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.11.0</version>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>com.google.code.gson</groupId>-->
+        <!--            <artifactId>gson</artifactId>-->
+        <!--            <version>2.11.0</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -634,6 +634,7 @@
             <artifactId>semver4j</artifactId>
             <version>3.1.0</version>
         </dependency>
+
         <!--        <dependency>-->
         <!--            <groupId>com.pixelduke</groupId>-->
         <!--            <artifactId>transit</artifactId>-->

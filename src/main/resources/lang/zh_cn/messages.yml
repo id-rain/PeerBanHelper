@@ -387,3 +387,7 @@ DOWNLOADER_BC_DOWNLOAD_DEPENDENCIES_FAILED: "下载连接到 BitComet 所需的 
 
 JAVALIN_PORT_IN_USE: "端口监听失败，端口 {} 已被其它进程占用。这可能是因为：(1)有两个 PeerBanHelper 正在运行（特别是您可能选择了安装为系统服务，这种情况下将会自动启动）(2)其它程序正在使用此端口（如 Uplay/Ubisoft Connect）；请跟随故障排除指南解决此问题。https://pbh-btn.github.io/pbh-docs/docs/faq"
 JAVALIN_PORT_REQUIRE_PRIVILEGES: "端口监听失败，监听 {} 端口需要权限提升。请更换一个 WebUI 端口或以管理员身份运行 PeerBanHelper"
+
+KAD_STARTING: "正在后台启动 Kademlia 节点，在连接到 PeerBanHelper Kademlia 网络后，您将可以与其它 PBH 节点通信和交换数据……"
+KAD_YOUR_PEERID: "您在 PeerBanHelper Kademlia 网络中的 PeerID 为：{} ({})"
+KAD_STARTED_UP: "PeerBanHelper Kademlia 引导完成，当前 Kademlia 节点数量: {}"

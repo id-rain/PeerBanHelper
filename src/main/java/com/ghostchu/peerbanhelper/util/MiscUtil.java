@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ServerSocket;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -20,6 +21,15 @@ import java.util.zip.GZIPOutputStream;
 
 public class MiscUtil {
     public static final Object EMPTY_OBJECT = new Object();
+
+    @SneakyThrows
+    public static int randomPort() {
+        try (
+                ServerSocket socket = new ServerSocket(0);
+        ) {
+            return socket.getLocalPort();
+        }
+    }
 
     public static void gzip(InputStream is, OutputStream os) throws IOException {
         GZIPOutputStream gzipOs = new GZIPOutputStream(os);

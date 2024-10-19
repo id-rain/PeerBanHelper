@@ -50,6 +50,7 @@ public class BtnNetwork {
     private final AtomicBoolean configSuccess = new AtomicBoolean(false);
     @Autowired
     private PeerRecordDao peerRecordDao;
+    @Autowired
     private ModuleMatchCache moduleMatchCache;
 
     public BtnNetwork(PeerBanHelperServer server, String userAgent, String configUrl, boolean submit, String appId, String appSecret) {
