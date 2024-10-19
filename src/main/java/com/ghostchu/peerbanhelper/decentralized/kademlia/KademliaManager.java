@@ -17,6 +17,8 @@ import de.cgrotz.kademlia.node.Node;
 import de.cgrotz.kademlia.routing.Bucket;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -90,19 +92,27 @@ public class KademliaManager implements Reloadable {
         byte[] id = new byte[Key.ID_LENGTH / 8];
         System.arraycopy(publicKey.getBytes(StandardCharsets.ISO_8859_1), 0, id, 0, id.length);
         log.info(tlUI(Lang.KAD_YOUR_PEERID, new String(id, StandardCharsets.ISO_8859_1), new Key(id).getKey().toString(16)));
+        Configurator.setRootLevel(Level.DEBUG);
         this.kad = new Kademlia(Configuration.builder()
                 .listeners(List.of(new UdpListener("0.0.0.0", port)))
+                .advertisedListeners(List.of(new UdpListener("127.0.0.1", port)))
                 .nodeId(new Key(id))
+                .getTimeoutMs(15 * 1000)
                 .build(), kademliaMemoryRepository);
+        //this.kad.put(new Key(7355608), "Kademlia network test - preload");
         cronJobs.scheduleWithFixedDelay(kad::refreshBuckets, 5, 60, TimeUnit.MINUTES);
         cronJobs.scheduleWithFixedDelay(kad::republishKeys, 1, 5, TimeUnit.MINUTES);
         List<KademliaPeerRecordEntity> bootstrapNodes = new ArrayList<>();
-        bootstrapNodes.add(new KademliaPeerRecordEntity(BigInteger.ZERO, "pbh-kad-bootstrap.ghostchu-services.top", 11455, new Timestamp(System.currentTimeMillis())));
-        bootstrapNodes.addAll(kademliaPeerRecordDao.fetchPeers(15));
+        //   bootstrapNodes.add(new KademliaPeerRecordEntity(BigInteger.ZERO, "pbh-kad-bootstrap.ghostchu-services.top", 11455, new Timestamp(System.currentTimeMillis())));
+        bootstrapNodes.add(new KademliaPeerRecordEntity(BigInteger.ZERO, "127.0.0.1", 11455, new Timestamp(System.currentTimeMillis())));
+
+        // bootstrapNodes.addAll(kademliaPeerRecordDao.fetchPeers(15));
         Thread.ofVirtual().start(() -> {
             bootstrapNodes.forEach(peer -> this.kad.bootstrap(Node.builder().advertisedListener(new UdpListener(peer.getHost(), peer.getPort())).build()));
             this.kad.republishKeys();
             log.info(tlUI(Lang.KAD_STARTED_UP, getConnectedNodeCount()));
+            log.info("搜索结果: {}", kad.get(new Key(7355608)));
+            ;
         });
     }
 
