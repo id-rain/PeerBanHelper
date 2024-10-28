@@ -19,6 +19,7 @@ import com.google.common.eventbus.EventBus;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.OkHttpClient;
 import org.bspfsystems.yamlconfiguration.configuration.InvalidConfigurationException;
 import org.bspfsystems.yamlconfiguration.file.YamlConfiguration;
 import org.jetbrains.annotations.Nullable;
@@ -81,6 +82,8 @@ public class Main {
     private static String[] startupArgs;
     @Getter
     private static long startupAt = System.currentTimeMillis();
+    @Getter
+    private static OkHttpClient sharedHttpClient;
 
     public static void main(String[] args) {
         startupArgs = args;
@@ -108,6 +111,7 @@ public class Main {
         guiManager.createMainWindow();
         pbhServerAddress = mainConfig.getString("server.prefix", "http://127.0.0.1:" + mainConfig.getInt("server.http"));
         setupProxySettings();
+        sharedHttpClient = new OkHttpClient();
         try {
             log.info(TextManager.tlUI(Lang.SPRING_CONTEXT_LOADING));
             applicationContext = new AnnotationConfigApplicationContext();
