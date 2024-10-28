@@ -1,44 +1,21 @@
 package com.ghostchu.peerbanhelper.util.network;
 
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.X509ExtendedTrustManager;
-import java.net.Socket;
-import java.security.cert.CertificateException;
+import javax.net.ssl.X509TrustManager;
 import java.security.cert.X509Certificate;
 
-public class IgnoreX509TrustManager extends X509ExtendedTrustManager {
+public class IgnoreX509TrustManager implements X509TrustManager {
     @Override
-    public void checkClientTrusted(X509Certificate[] x509Certificates, String s, Socket socket) throws CertificateException {
+    public void checkClientTrusted(X509Certificate[] x509Certificates, String s) {
 
     }
 
     @Override
-    public void checkServerTrusted(X509Certificate[] x509Certificates, String s, Socket socket) throws CertificateException {
-
-    }
-
-    @Override
-    public void checkClientTrusted(X509Certificate[] x509Certificates, String s, SSLEngine sslEngine) throws CertificateException {
-
-    }
-
-    @Override
-    public void checkServerTrusted(X509Certificate[] x509Certificates, String s, SSLEngine sslEngine) throws CertificateException {
-
-    }
-
-    @Override
-    public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-
-    }
-
-    @Override
-    public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+    public void checkServerTrusted(X509Certificate[] x509Certificates, String s) {
 
     }
 
     @Override
     public X509Certificate[] getAcceptedIssuers() {
-        return new X509Certificate[]{};
+        return new X509Certificate[0];
     }
 }

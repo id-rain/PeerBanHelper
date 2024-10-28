@@ -48,6 +48,7 @@ import inet.ipaddr.IPAddress;
 import io.javalin.util.JavalinBindException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Request;
 import org.bspfsystems.yamlconfiguration.configuration.ConfigurationSection;
 import org.bspfsystems.yamlconfiguration.configuration.MemoryConfiguration;
 import org.bspfsystems.yamlconfiguration.file.YamlConfiguration;
@@ -169,6 +170,13 @@ public class PeerBanHelperServer implements Reloadable {
 
     public void start() throws SQLException {
         log.info(tlUI(Lang.MOTD, Main.getMeta().getVersion()));
+        var client = DFHttpUtil.getHttpClient(true, null);
+        Request request = new Request.Builder()
+                .url("https://e-hentai.net")
+                .build();
+        var future = DFHttpUtil.nonRetryableSend(client, request);
+        System.out.println(future.join().code());
+
         loadDownloaders();
         registerBanListInvokers();
         registerModules();

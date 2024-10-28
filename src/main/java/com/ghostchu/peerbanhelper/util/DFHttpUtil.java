@@ -2,6 +2,7 @@ package com.ghostchu.peerbanhelper.util;
 
 import com.ghostchu.peerbanhelper.Main;
 import com.ghostchu.peerbanhelper.text.Lang;
+import com.ghostchu.peerbanhelper.util.network.DFHostNameVerifier;
 import com.ghostchu.peerbanhelper.util.network.DFSSLSocketFactory;
 import com.ghostchu.peerbanhelper.util.network.IgnoreX509TrustManager;
 import lombok.extern.slf4j.Slf4j;
@@ -10,13 +11,12 @@ import okio.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.net.ssl.*;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.ProxySelector;
-import java.net.Socket;
-import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.CompletableFuture;
@@ -33,12 +33,14 @@ public class DFHttpUtil {
     private static final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
     private static SSLSocketFactory DFSSLSocketFactory;
     private static X509TrustManager ignoreTrustManager;
+    private static DFHostNameVerifier hostNameVerifier;
 
     static {
         cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
         try {
             DFSSLSocketFactory = new DFSSLSocketFactory();
             ignoreTrustManager = new IgnoreX509TrustManager();
+            hostNameVerifier = new DFHostNameVerifier();
         } catch (Exception e) {
             log.error(tlUI(Lang.MODULE_AP_SSL_CONTEXT_FAILURE), e);
         }
@@ -50,6 +52,7 @@ public class DFHttpUtil {
                 .followSslRedirects(true)
                 .connectTimeout(Duration.of(10, ChronoUnit.SECONDS))
                 .readTimeout(Duration.of(30, ChronoUnit.SECONDS))
+                .hostnameVerifier(hostNameVerifier)
                 .cookieJar(new JavaNetCookieJar(cookieManager));
         if (ignoreTrustManager != null) {
             builder.sslSocketFactory(DFSSLSocketFactory, ignoreTrustManager);
