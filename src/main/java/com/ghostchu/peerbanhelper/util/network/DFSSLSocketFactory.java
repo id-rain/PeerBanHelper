@@ -33,7 +33,7 @@ public class DFSSLSocketFactory extends SSLSocketFactory {
 
     @Override
     public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException {
-        if (Boolean.parseBoolean(System.getProperty("pbh.domain-fronting", "true"))) {
+        if (!Boolean.parseBoolean(System.getProperty("pbh.domain-fronting", "true"))) {
             return ((SSLSocketFactory) getDefault()).createSocket(s, host, port, autoClose);
         }
         InetAddress address = s.getInetAddress();
