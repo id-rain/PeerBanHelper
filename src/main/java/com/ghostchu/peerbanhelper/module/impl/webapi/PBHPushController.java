@@ -14,6 +14,7 @@ import com.ghostchu.peerbanhelper.web.Role;
 import com.ghostchu.peerbanhelper.web.wrapper.StdResp;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import static com.ghostchu.peerbanhelper.text.TextManager.tl;
 
 @Component
 @IgnoreScan
+@Slf4j
 public class PBHPushController extends AbstractFeatureModule {
     @Autowired
     private JavalinWebContainer webContainer;
@@ -63,6 +65,7 @@ public class PBHPushController extends AbstractFeatureModule {
                 ctx.json(new StdResp(false, tl(locale(ctx), Lang.PUSH_PROVIDER_TEST_FAILED, name, providerType), null));
             }
         } catch (Exception e) {
+            log.warn("Unable to test the push provider", e);
             ctx.json(new StdResp(false, tl(locale(ctx), Lang.PUSH_PROVIDER_TEST_FAILED, name, providerType, e), null));
         }
     }
