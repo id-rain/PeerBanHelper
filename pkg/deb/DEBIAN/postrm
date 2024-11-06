@@ -1,0 +1,2 @@
+#!/bin/sh -e
+[ $1 = purge ] && rm -rf /etc/peerbanhelper || find /etc/peerbanhelper -mindepth 1 -maxdepth 1 ! -name config ! -name scripts -exec rm -rf {} +
