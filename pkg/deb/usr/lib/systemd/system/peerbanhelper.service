@@ -6,6 +6,7 @@ After=network.target
 User=peerbanhelper
 WorkingDirectory=/etc/peerbanhelper
 ExecStart=/usr/bin/java -Dpbh.release=debian -Dpbh.datadir=/etc/peerbanhelper -Dpbh.log.level=WARN -Xmx512M -XX:+UseG1GC -XX:+UseStringDeduplication -XX:+ShrinkHeapInSteps -jar /usr/lib/peerbanhelper/PeerBanHelper.jar
+AmbientCapabilities=CAP_NET_ADMIN
 Restart=on-failure
 
 [Install]
