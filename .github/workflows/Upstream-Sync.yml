@@ -1,0 +1,63 @@
+name: Upstream Sync
+
+permissions:
+    contents: write
+
+on:
+    schedule:
+        - cron: "0 0 * * *"
+    workflow_dispatch:
+
+env:
+    # github-actions bot
+    GIT_USER_NAME: "github-actions[bot]"
+    GIT_USER_EMAIL: "github-actions[bot]@users.noreply.github.com"
+    # 上游仓库
+    UPSTREAM_SYNC_REPO: "PBH-BTN/PeerBanHelper"
+    # 上游分支
+    UPSTREAM_SYNC_BRANCH: "dev"
+    # 目标分支
+    TARGET_SYNC_BRANCH: "dev"
+    # 强制推送[常规同步失败后使用强制推送同步] true 或 false
+    FORCE_PUSH: "true"
+    # 测试模式[仅模拟流程不实际同步] true 或 false
+    TEST_MODE: "false"
+
+jobs:
+    sync_with_upstream:
+        name: Sync with Upstream
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout target repo
+              uses: actions/checkout@v3
+
+            - name: Sync Upstream
+              id: sync_upstream
+              uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
+              with:
+                  target_repo_token: ${{ secrets.GITHUB_TOKEN }}
+                  upstream_sync_repo: ${{ env.UPSTREAM_SYNC_REPO }}
+                  upstream_sync_branch: ${{ env.UPSTREAM_SYNC_BRANCH }}
+                  target_sync_branch: ${{ env.TARGET_SYNC_BRANCH }}
+                  test_mode: ${{ env.TEST_MODE }}
+
+            - name: Force Push on Failure
+              if: failure()
+              run: |
+                  if [ "${{ env.FORCE_PUSH }}" = "true" ]; then
+                      echo "Force push enabled. Attempting to force push changes."
+                      git config user.name "${{ env.GIT_USER_NAME }}"
+                      git config user.email "${{ env.GIT_USER_EMAIL }}"
+                      git remote add upstream https://github.com/${{ env.UPSTREAM_SYNC_REPO }}.git
+                      git fetch upstream ${{ env.UPSTREAM_SYNC_BRANCH }}
+                      git reset --hard upstream/${{ env.UPSTREAM_SYNC_BRANCH }}
+                      git push origin ${{ env.TARGET_SYNC_BRANCH }} --force
+                  else
+                      echo "[Warning] Sync failed and force push is not enabled. Exiting with error."
+                      exit 1
+                  fi
+
+            - name: Verify Success
+              if: success()
+              run: echo "Upstream sync completed successfully."
