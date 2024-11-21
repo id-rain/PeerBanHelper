@@ -21,7 +21,7 @@ env:
     # 强制推送[常规同步失败后使用强制推送同步] true 或 false
     FORCE_PUSH: "true"
     # 测试模式[仅模拟流程不实际同步] true 或 false
-    TEST_MODE: "false"
+    TEST_MODE: "true"
 
 jobs:
     sync_with_upstream:
