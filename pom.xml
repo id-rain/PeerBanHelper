@@ -6,7 +6,7 @@
 
     <groupId>com.ghostchu.peerbanhelper</groupId>
     <artifactId>peerbanhelper</artifactId>
-    <version>7.1.5</version>
+    <version>7.2.0-Alpha1</version>
     <packaging>jar</packaging>
 
     <name>PeerBanHelper</name>
@@ -17,8 +17,6 @@
         <mainClass>com.ghostchu.peerbanhelper.MainJumpLoader</mainClass>
         <maven.build.timestamp.format>yyyyMMdd-HHmmss</maven.build.timestamp.format>
         <flatlafVersion>3.5.2</flatlafVersion>
-        <javafx.version>24-ea+5</javafx.version>
-        <javafx.scope>provided</javafx.scope>
         <install4j.home>/opt/install4j</install4j.home>
         <ormlite.version>6.1</ormlite.version>
     </properties>
@@ -168,7 +166,7 @@
                     <plugin>
                         <groupId>com.install4j</groupId>
                         <artifactId>install4j-maven</artifactId>
-                        <version>10.0.8</version>
+                        <version>11.0.1</version>
                         <executions>
                             <execution>
                                 <id>compile-installers</id>
@@ -197,7 +195,7 @@
                     <plugin>
                         <groupId>com.install4j</groupId>
                         <artifactId>install4j-maven</artifactId>
-                        <version>10.0.8</version>
+                        <version>11.0.1</version>
                         <executions>
                             <execution>
                                 <id>compile-installers</id>
@@ -396,10 +394,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-email -->
         <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>jakarta.mail</artifactId>
-            <version>2.0.1</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-email</artifactId>
+            <version>1.6.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.james</groupId>
@@ -439,6 +438,17 @@
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
             <version>1.79</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcpg-jdk18on -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpg-jdk18on</artifactId>
+            <version>1.79</version>
+        </dependency>
+        <dependency>
+            <groupId>name.neuhalfen.projects.crypto.bouncycastle.openpgp</groupId>
+            <artifactId>bouncy-gpg</artifactId>
+            <version>2.3.0</version>
         </dependency>
         <dependency>
             <groupId>com.vdurmont</groupId>
@@ -490,7 +500,20 @@
             <artifactId>flatlaf-extras</artifactId>
             <version>3.5.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.offbynull.portmapper</groupId>
+            <artifactId>portmapper</artifactId>
+            <version>2.0.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ipfs</groupId>
+            <artifactId>java-ipfs-http-client</artifactId>
+            <version>1.4.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.multiformats</groupId>
+            <artifactId>java-multiaddr</artifactId>
+            <version>v1.4.12</version>
+        </dependency>
     </dependencies>
-
-
 </project>
