@@ -7,7 +7,7 @@ export default {
   'plus.key': '许可证',
   'plus.type': '类型',
   'plus.type.local': '本地',
-  'plus.type.aifadian': '爱发电',
+  'plus.type.afdian': '爱发电',
   'plus.licenseTo': '授权给',
   'plus.startAt': '开始时间',
   'plus.expireAt': '过期时间',
@@ -20,5 +20,5 @@ export default {
   'plus.activeSuccess': '激活成功',
 
   'plus.or': '或者',
-  'plus.try': '立即体验15天！'
+  'plus.try': '我不想捐赠'
 }

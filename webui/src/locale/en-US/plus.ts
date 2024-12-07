@@ -7,7 +7,7 @@ export default {
   'plus.key': 'License',
   'plus.type': 'Type',
   'plus.type.local': 'Local',
-  'plus.type.aifadian': 'Aifadian',
+  'plus.type.afdian': 'Aifadian',
   'plus.licenseTo': 'License to',
   'plus.startAt': 'Issued on',
   'plus.expireAt': 'Expire on',
@@ -20,5 +20,5 @@ export default {
   'plus.activeSuccess': 'Activation successful',
 
   'plus.or': 'Or',
-  'plus.try': 'Try it now for 15 days!'
+  'plus.try': "I don't want to donate"
 }
